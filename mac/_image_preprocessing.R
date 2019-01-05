@@ -2,14 +2,14 @@
 # H. Achicanoy
 # Universidad del Valle, 2018
 
-options(warn = -1); options(scipen = 999)
+options(warn = -1, scipen = 999)
 
 suppressMessages(library(pacman))
 suppressMessages(pacman::p_load(raster, imager, corpcor, EBImage, CRImage, tidyverse, FactoMineR))
 
 # List of images for processing
-img_path <- "~/Documents/Data/Computer_vision/clear_bckg/_img_orgnl"
-out_path <- "~/Documents/Data/Computer_vision/clear_bckg/_img_sgmn"
+img_path <- "~/Documents/Data/Computer_vision/thesis/_img_orgnl" # "~/Documents/Data/Computer_vision/clear_bckg/_img_orgnl"
+out_path <- "~/Documents/Data/Computer_vision/thesis/_img_sgmn" # "~/Documents/Data/Computer_vision/clear_bckg/_img_sgmn"
 list.files2 <- Vectorize(FUN = list.files, vectorize.args = "path")
 img_code <- list.files(path = img_path)
 img_list <- list.files2(path = paste0(img_path, "/", img_code),
@@ -115,7 +115,9 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   # Create individual segmented images
   img_labels <- img_wtrs@.Data %>% as.numeric %>% unique %>% sort
   img_labels <- img_labels[-1]
-  img_labels <- img_labels[-as.numeric(names(bxplt$out))]
+  if(length(bxplt$out) > 0){
+    img_labels <- img_labels[-as.numeric(names(bxplt$out))]
+  }
   img_crpd <- lapply(1:length(img_labels), function(i){
     
     wtrs.mat <- img_wtrs@.Data
@@ -181,7 +183,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
     return(img_adjtd)
   }
   img_fnal <- img_crpd
-  for(i in 1:length(img_crpd)){img_fnal[[i]] <- adjImg(img = img_crpd[[i]], desired_dim = 100); print(i)}
+  for(i in 1:length(img_crpd)){img_fnal[[i]] <- adjImg(img = img_crpd[[i]], desired_dim = desired_dim); print(i)}
   outDir <- paste0(out_path, "/", img_nm)
   if(!dir.exists(outDir) | (dir.exists(outDir) & length(list.files(outDir)) == 0)){
     dir.create(path = outDir, recursive = T)
@@ -200,11 +202,17 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   return(cat(paste0("Process done for seed: ", img_nm, "\n")))
 }
 
-img_blck_flt <- img_blck[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
-img_list_flt <- img_list[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
-img_code_flt <- img_code[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
-lapply(X = 10:length(img_blck_flt),
-       FUN = function(i) prepImage(img_pth_ifr = img_blck_flt[i],
-                                   img_pth_rgb = img_list_flt[i],
-                                   img_nm = img_code_flt[i],
+lapply(X = 1:length(img_blck),
+       FUN = function(i) prepImage(img_pth_ifr = img_blck[i],
+                                   img_pth_rgb = img_list[i],
+                                   img_nm = img_code[i],
                                    desired_dim = 100))
+
+# img_blck_flt <- img_blck[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
+# img_list_flt <- img_list[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
+# img_code_flt <- img_code[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
+# lapply(X = 10:length(img_blck_flt),
+#        FUN = function(i) prepImage(img_pth_ifr = img_blck_flt[i],
+#                                    img_pth_rgb = img_list_flt[i],
+#                                    img_nm = img_code_flt[i],
+#                                    desired_dim = 100))
