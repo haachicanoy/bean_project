@@ -1,6 +1,6 @@
 # Final image processing code
 # H. Achicanoy
-# Universidad del Valle, 2018
+# Universidad del Valle, 2018-2019
 
 options(warn = -1, scipen = 999)
 
