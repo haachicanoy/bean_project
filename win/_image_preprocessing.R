@@ -2,7 +2,7 @@
 # H. Achicanoy
 # Universidad del Valle, 2018-2019
 
-options(warn = -1); options(scipen = 999)
+options(warn = -1, scipen = 999)
 
 suppressMessages(library(pacman))
 suppressMessages(pacman::p_load(raster, imager, corpcor, EBImage, CRImage, tidyverse, FactoMineR))
@@ -202,13 +202,13 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   return(cat(paste0("Process done for seed: ", img_nm, "\n")))
 }
 
-lapply(X = 1:length(img_blck),
+lapply(X = 610:length(img_blck),
        FUN = function(i) prepImage(img_pth_ifr = img_blck[i],
                                    img_pth_rgb = img_list[i],
                                    img_nm = img_code[i],
                                    desired_dim = 100))
 
-# Process done for seed: 18ADB02608_000
+# Process done for seed: 18ADB02618_000 [609]
 
 # img_blck_flt <- img_blck[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
 # img_list_flt <- img_list[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
