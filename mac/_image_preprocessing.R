@@ -107,7 +107,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   # img_thr1@.Data <- 1 - img_thr1@.Data # Local adaptative threshold
   kernel <- EBImage::makeBrush(size = 5, shape = "gaussian", sigma = 1) # Create a Gaussian kernel
   img_mplg <- img_thr0 %>% EBImage::opening(kern = kernel) # Morphological operators: opening, erode, dilate, closing
-  img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 1) # Apply Watershed algorithm 
+  img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 3) # Apply Watershed algorithm using a tolerance of 3
   # plot(colorLabels(img_wtrs), all = TRUE) # Visualize Watershed results
   fts_shap <- EBImage::computeFeatures.shape(img_wtrs) # Extract shape statistics from segmented regions
   bxplt <- boxplot(fts_shap[,1]) # Identify outliers
