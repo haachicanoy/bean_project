@@ -103,8 +103,8 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   img_gray <- img %>% EBImage::channel("gray") # Converting to grayscale image
   img_fltd <- img_gray # Apply image filtering. img_fltd <- img_gray %>% EBImage::medianFilter(size = 2)
   img_thr0 <- img_fltd <= EBImage::otsu(img_fltd) # Global threshold of image
-  img_thr1 <- img_fltd %>% EBImage::thresh(w = 10, h = 10, offset = 0.05)
-  img_thr1@.Data <- 1 - img_thr1@.Data # Local adaptative threshold
+  # img_thr1 <- img_fltd %>% EBImage::thresh(w = 10, h = 10, offset = 0.05)
+  # img_thr1@.Data <- 1 - img_thr1@.Data # Local adaptative threshold
   kernel <- EBImage::makeBrush(size = 5, shape = "gaussian", sigma = 1) # Create a Gaussian kernel
   img_mplg <- img_thr0 %>% EBImage::opening(kern = kernel) # Morphological operators: opening, erode, dilate, closing
   img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 1) # Apply Watershed algorithm 
@@ -206,7 +206,7 @@ lapply(X = 1:length(img_blck),
        FUN = function(i) prepImage(img_pth_ifr = img_blck[i],
                                    img_pth_rgb = img_list[i],
                                    img_nm = img_code[i],
-                                   desired_dim = 100))
+                                   desired_dim = 300))
 
 # img_blck_flt <- img_blck[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
 # img_list_flt <- img_list[c(3,4,5,7,10,11,12,13,14,15,16,18,19,21,22,24,27,31,32,33,39,41)]
