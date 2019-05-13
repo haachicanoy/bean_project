@@ -1,23 +1,26 @@
-# Final image processing code
-# H. Achicanoy
-# Universidad del Valle, 2018-2019
+# Image processing in R: image segmentation
+# Harold Achicanoy
+# Universidad del Valle, 2019
 
-options(warn = -1, scipen = 999)
+g <- gc(); rm(list = ls()); options(warn = -1, scipen = 999)
 
 suppressMessages(library(pacman))
 suppressMessages(pacman::p_load(raster, imager, corpcor, EBImage, CRImage, tidyverse, FactoMineR))
 
-# List of images for processing
-img_path <- "D:/Bean_project/_photos/_colored_seg_images"
-out_path <- "D:/Bean_project/_photos/_img_sgmn"
+# List images for processing
+# img_path <- "D:/Bean_project/_photos/_colored_seg_images"
+img_path <- choose.dir()
+out_path <- "D:/Bean_seeds_similarity/_photos/_thesis/segmented"
+if(!dir.exists(out_path)){dir.create(out_path, recursive = T)}
 list.files2 <- Vectorize(FUN = list.files, vectorize.args = "path")
-img_code <- list.files(path = img_path)
+img_code <- list.dirs(path = img_path, recursive = F, full.names = F)
 img_list <- list.files2(path = paste0(img_path, "/", img_code),
-                       pattern = "*_color.jpg$",
+                       pattern = "color{1}",
                        full.names = T)
 img_blck <- list.files2(path = paste0(img_path, "/", img_code),
-                        pattern = "*_seg.jpg$",
-                        full.names = T); rm(list.files2)
+                        pattern = "seg{1}",
+                        full.names = T)
+rm(list.files2)
 
 # --------------------------------------------------------------------------------------------- #
 # Image processing own functions
@@ -107,7 +110,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   img_thr1@.Data <- 1 - img_thr1@.Data # Local adaptative threshold
   kernel <- EBImage::makeBrush(size = 5, shape = "gaussian", sigma = 1) # Create a Gaussian kernel
   img_mplg <- img_thr0 %>% EBImage::opening(kern = kernel) # Morphological operators: opening, erode, dilate, closing
-  img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 1) # Apply Watershed algorithm 
+  img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 3) # Apply Watershed algorithm 
   # plot(colorLabels(img_wtrs), all = TRUE) # Visualize Watershed results
   fts_shap <- EBImage::computeFeatures.shape(img_wtrs) # Extract shape statistics from segmented regions
   bxplt <- boxplot(fts_shap[,1]) # Identify outliers
@@ -183,7 +186,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
     return(img_adjtd)
   }
   img_fnal <- img_crpd
-  for(i in 1:length(img_crpd)){img_fnal[[i]] <- adjImg(img = img_crpd[[i]], desired_dim = 100); print(i)}
+  for(i in 1:length(img_crpd)){img_fnal[[i]] <- adjImg(img = img_crpd[[i]], desired_dim = desired_dim); print(i)}
   outDir <- paste0(out_path, "/", img_nm)
   if(!dir.exists(outDir) | (dir.exists(outDir) & length(list.files(outDir)) == 0)){
     dir.create(path = outDir, recursive = T)
@@ -202,7 +205,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   return(cat(paste0("Process done for seed: ", img_nm, "\n")))
 }
 
-lapply(X = 610:length(img_blck),
+lapply(X = 1:length(img_code),
        FUN = function(i) prepImage(img_pth_ifr = img_blck[i],
                                    img_pth_rgb = img_list[i],
                                    img_nm = img_code[i],
