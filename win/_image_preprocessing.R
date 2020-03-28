@@ -94,10 +94,10 @@ plot(aux)
 # --------------------------------------------------------------------------------------------- #
 # Image processing for one image
 # --------------------------------------------------------------------------------------------- #
-prepImage <- function(img_pth_ifr = img_blck[27],
-                      img_pth_rgb = img_list[27],
-                      img_nm = img_code[27],
-                      desired_dim = 100){
+prepImage <- function(img_pth_ifr = img_blck[9],
+                      img_pth_rgb = img_list[9],
+                      img_nm = img_code[9],
+                      desired_dim = 512){
   
   img_rgb <- img_pth_rgb %>% EBImage::readImage() # Load RGB image
   
@@ -108,8 +108,8 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   img_thr0 <- img_fltd <= EBImage::otsu(img_fltd) # Global threshold of image
   img_thr1 <- img_fltd %>% EBImage::thresh(w = 10, h = 10, offset = 0.05)
   img_thr1@.Data <- 1 - img_thr1@.Data # Local adaptative threshold
-  kernel <- EBImage::makeBrush(size = 5, shape = "gaussian", sigma = 1) # Create a Gaussian kernel
-  img_mplg <- img_thr0 %>% EBImage::opening(kern = kernel) # Morphological operators: opening, erode, dilate, closing
+  kernel <- EBImage::makeBrush(size = 1, shape = "box", step = F) # Create a disc kernel
+  img_mplg <- img_thr0 %>% EBImage::dilate(kern = kernel) # Morphological operators: opening, erode, dilate, closing
   img_wtrs <- EBImage::watershed(EBImage::distmap(img_mplg), 3) # Apply Watershed algorithm 
   # plot(colorLabels(img_wtrs), all = TRUE) # Visualize Watershed results
   fts_shap <- EBImage::computeFeatures.shape(img_wtrs) # Extract shape statistics from segmented regions
@@ -152,7 +152,7 @@ prepImage <- function(img_pth_ifr = img_blck[27],
   }
   
   # Fit each individual image to desired dimension
-  adjImg <- function(img = img_crpd[[33]], desired_dim = 90){
+  adjImg <- function(img = img_crpd[[33]], desired_dim = desired_dim){
     # Extract channel information
     r <- img@.Data[,,1]
     g <- img@.Data[,,2]
@@ -161,26 +161,26 @@ prepImage <- function(img_pth_ifr = img_blck[27],
     rows2add <- (desired_dim - dim(r)[1])/2
     cols2add <- (desired_dim - dim(r)[2])/2
     # Adding columns and rows to R channel
-    r <- rbind(matrix(rep(0, floor(rows2add)*dim(r)[2]), nrow = floor(rows2add)),
+    r <- rbind(matrix(rep(255, floor(rows2add)*dim(r)[2]),   nrow = floor(rows2add)),
                r,
-               matrix(rep(0, ceiling(rows2add)*dim(r)[2]), nrow = ceiling(rows2add)))
-    r <- cbind(matrix(rep(0, floor(cols2add)*dim(r)[1]), ncol = floor(cols2add)),
+               matrix(rep(255, ceiling(rows2add)*dim(r)[2]), nrow = ceiling(rows2add)))
+    r <- cbind(matrix(rep(255, floor(cols2add)*dim(r)[1]),   ncol = floor(cols2add)),
                r,
-               matrix(rep(0, ceiling(cols2add)*dim(r)[1]), ncol = ceiling(cols2add)))
+               matrix(rep(255, ceiling(cols2add)*dim(r)[1]), ncol = ceiling(cols2add)))
     # Adding columns and rows to G channel
-    g <- rbind(matrix(rep(0, floor(rows2add)*dim(g)[2]), nrow = floor(rows2add)),
+    g <- rbind(matrix(rep(255, floor(rows2add)*dim(g)[2]),   nrow = floor(rows2add)),
                g,
-               matrix(rep(0, ceiling(rows2add)*dim(g)[2]), nrow = ceiling(rows2add)))
-    g <- cbind(matrix(rep(0, floor(cols2add)*dim(g)[1]), ncol = floor(cols2add)),
+               matrix(rep(255, ceiling(rows2add)*dim(g)[2]), nrow = ceiling(rows2add)))
+    g <- cbind(matrix(rep(255, floor(cols2add)*dim(g)[1]),   ncol = floor(cols2add)),
                g,
-               matrix(rep(0, ceiling(cols2add)*dim(g)[1]), ncol = ceiling(cols2add)))
+               matrix(rep(255, ceiling(cols2add)*dim(g)[1]), ncol = ceiling(cols2add)))
     # Adding columns and rows to B channel
-    b <- rbind(matrix(rep(0, floor(rows2add)*dim(b)[2]), nrow = floor(rows2add)),
+    b <- rbind(matrix(rep(255, floor(rows2add)*dim(b)[2]),   nrow = floor(rows2add)),
                b,
-               matrix(rep(0, ceiling(rows2add)*dim(b)[2]), nrow = ceiling(rows2add)))
-    b <- cbind(matrix(rep(0, floor(cols2add)*dim(b)[1]), ncol = floor(cols2add)),
+               matrix(rep(255, ceiling(rows2add)*dim(b)[2]), nrow = ceiling(rows2add)))
+    b <- cbind(matrix(rep(255, floor(cols2add)*dim(b)[1]),   ncol = floor(cols2add)),
                b,
-               matrix(rep(0, ceiling(cols2add)*dim(b)[1]), ncol = ceiling(cols2add)))
+               matrix(rep(255, ceiling(cols2add)*dim(b)[1]), ncol = ceiling(cols2add)))
     # Creating array and image
     img_adjtd <- EBImage::rgbImage(red = r, green = g, blue = b)
     return(img_adjtd)
